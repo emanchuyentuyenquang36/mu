@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DACAN MUSIC</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: #050510;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        /* NỀN */
+        .background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 20% 20%, #24105a 0, transparent 35%),
+                radial-gradient(circle at 80% 75%, #082d50 0, transparent 35%),
+                #050510;
+        }
+
+        .background::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(#ffffff08 1px, transparent 1px),
+                linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+            background-size: 45px 45px;
+            animation: moveGrid 12s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            from { transform: translateY(0); }
+            to { transform: translateY(45px); }
+        }
+
+        /* TIÊU ĐỀ */
+        header {
+            padding: 35px 15px 10px;
+        }
+
+        h1 {
+            font-size: clamp(36px, 7vw, 72px);
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow:
+                0 0 10px #00eaff,
+                0 0 25px #00eaff,
+                0 0 55px #7b2cff;
+        }
+
+        .subtitle {
+            margin-top: 12px;
+            color: #b7c8ff;
+            letter-spacing: 4px;
+            font-size: 12px;
+        }
+
+        /* KHUNG CHÍNH */
+        .container {
+            width: min(1100px, 94%);
+            margin: 25px auto 40px;
+        }
+
+        .panel {
+            padding: 25px 18px;
+            border: 1px solid #00eaff66;
+            border-radius: 24px;
+            background: #0a0a20cc;
+            box-shadow:
+                0 0 25px #00d9ff22,
+                inset 0 0 25px #7b2cff12;
+            backdrop-filter: blur(10px);
+        }
+
+        /* KHU VỰC ẢNH */
+        .gallery {
+            display: none;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .gallery.show-images {
+            display: grid;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .photo-frame {
+            position: relative;
+            padding: 5px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #00eaff, #8a2bff, #ff3cac);
+            box-shadow: 0 0 18px #00eaff33;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .photo {
+            display: block;
+            width: 100%;
+            height: clamp(130px, 27vw, 300px);
+            object-fit: cover;
+            border-radius: 14px;
+            background: #101025;
+        }
+
+        .photo-frame.center {
+            transform: scale(1.06);
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px #00eaff44;
+            }
+            to {
+                box-shadow: 0 0 28px #a12bff99;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TRẠNG THÁI */
+        .status {
+            min-height: 24px;
+            margin: 18px 0;
+            color: #8eefff;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* VISUALIZER */
+        .visualizer {
+            width: 100%;
+            height: 150px;
+            display: block;
+            margin: 10px auto 20px;
+            border-radius: 14px;
+        }
+
+        /* NÚT */
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        button {
+            min-width: 115px;
+            padding: 13px 22px;
+            border: 1px solid #00eaff;
+            border-radius: 30px;
+            background: #07172b;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        button:hover {
+            background: #00cfe8;
+            color: #050510;
+            box-shadow: 0 0 22px #00eaff99;
+            transform: translateY(-2px);
+        }
+
+        button.play {
+            background: linear-gradient(90deg, #00cfe8, #7d3cff);
+            border: none;
+            box-shadow: 0 0 18px #00cfe855;
+        }
+
+        /* CHỌN NHẠC */
+        .file-picker {
+            display: inline-block;
+            margin: 5px 0 10px;
+            padding: 12px 20px;
+            border: 1px dashed #8b7bff;
+            border-radius: 14px;
+            color: #d8d3ff;
+            cursor: pointer;
+            background: #16112b;
+        }
+
+        .file-picker:hover {
+            border-color: #00eaff;
+            color: #00eaff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .filename {
+            margin-top: 10px;
+            color: #b4c5ff;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        footer {
+            padding: 0 15px 25px;
+            color: #7780a9;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .panel {
+                padding: 18px 10px;
+            }
+
+            .gallery {
+                gap: 8px;
+            }
+
+            .photo-frame {
+                padding: 3px;
+                border-radius: 11px;
+            }
+
+            .photo {
+                height: 145px;
+                border-radius: 8px;
+            }
+
+            button {
+                min-width: 95px;
+                padding: 12px 15px;
+            }
+
+            .subtitle {
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+
+    <header>
+        <h1>DACAN MUSIC</h1>
+        <p class="subtitle">FEEL THE MUSIC · FEEL THE LIGHT</p>
+    </header>
+
+    <main class="container">
+        <section class="panel">
+
+            <!-- =====================================
+                 THAY 3 ẢNH TẠI ĐÂY
+
+                 Đặt 3 ảnh cùng thư mục với file HTML.
+                 Đổi tên trong thuộc tính src nếu cần.
+                 Ví dụ: src="anh-cua-ban.jpg"
+                 ===================================== -->
+
+            <div class="gallery" id="gallery">
+
+                <div class="photo-frame">
+                    <img
+                        class="photo"
+                        id="leftPhoto"
+                        src="anh2.jpg"
+                        alt="Ảnh bên trái"
+                    >
+                </div>
+
+                <div class="photo-frame center">
+                    <img
+                        class="photo"
+                        id="centerPhoto"
+                        src="anh1.jpg"
+                        alt="Ảnh chính ở giữa"
+                    >
+                </div>
+
+                <div class="photo-frame">
+                    <img
+                        class="photo"
+                        id="rightPhoto"
+                        src="anh3.jpg"
+                        alt="Ảnh bên phải"
+                    >
+                </div>
+
+            </div>
+
+            <!-- CHỌN NHẠC -->
+            <label class="file-picker" for="musicFile">
+                🎵 CHỌN FILE NHẠC
+            </label>
+
+            <input
+                type="file"
+                id="musicFile"
+                accept="audio/*"
+            >
+
+            <div class="filename" id="filename">
+                Chưa chọn bài hát
+            </div>
+
+            <p class="status" id="status">
+                Hãy chọn nhạc rồi nhấn PHÁT NHẠC
+            </p>
+
+            <!-- HIỆU ỨNG ÂM THANH -->
+            <canvas class="visualizer" id="visualizer"></canvas>
+
+            <!-- ĐIỀU KHIỂN -->
+            <div class="controls">
+                <button class="play" id="playBtn">
+                    ▶ PHÁT NHẠC
+                </button>
+
+                <button id="pauseBtn">
+                    ⏸ TẠM DỪNG
+                </button>
+
+                <button id="stopBtn">
+                    ■ DỪNG
+                </button>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        © DACAN MUSIC · MADE WITH MUSIC
+    </footer>
+
+    <script>
+        // =========================================
+        // CÁC THÀNH PHẦN
+        // =========================================
+
+        const musicFile = document.getElementById("musicFile");
+        const filename = document.getElementById("filename");
+        const statusText = document.getElementById("status");
+        const gallery = document.getElementById("gallery");
+
+        const canvas = document.getElementById("visualizer");
+        const ctx = canvas.getContext("2d");
+
+        const playBtn = document.getElementById("playBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const stopBtn = document.getElementById("stopBtn");
+
+        // Tạo trình phát nhạc
+        const audio = new Audio();
+        audio.loop = false;
+
+        let audioContext = null;
+        let analyser = null;
+        let source = null;
+        let frequencyData = null;
+        let animationStarted = false;
+        let selectedMusicURL = null;
+
+        // =========================================
+        // HIỂN THỊ TÊN NHẠC ĐÃ CHỌN
+        // =========================================
+
+        musicFile.addEventListener("change", () => {
+            const file = musicFile.files[0];
+
+            if (!file) return;
+
+            if (selectedMusicURL) {
+                URL.revokeObjectURL(selectedMusicURL);
+            }
+
+            selectedMusicURL = URL.createObjectURL(file);
+            audio.src = selectedMusicURL;
+
+            filename.textContent = "🎧 " + file.name;
+            statusText.textContent = "Đã chọn nhạc. Nhấn PHÁT NHẠC để bắt đầu.";
+        });
+
+        // =========================================
+        // KIỂM TRA 3 ẢNH
+        // =========================================
+
+        function checkImages() {
+            const images = [
+                document.getElementById("leftPhoto"),
+                document.getElementById("centerPhoto"),
+                document.getElementById("rightPhoto")
+            ];
+
+            for (const img of images) {
+                if (!img.getAttribute("src")) {
+                    statusText.textContent =
+                        "Bạn hãy thêm đường dẫn cho đủ 3 ảnh trong code.";
+                    return false;
+                }
+
+                if (img.complete && img.naturalWidth === 0) {
+                    statusText.textContent =
+                        "Không tìm thấy ảnh: " + img.getAttribute("src");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // =========================================
+        // KHỞI TẠO HIỆU ỨNG NHẠC
+        // =========================================
+
+        async function setupVisualizer() {
+            if (audioContext) {
+                if (audioContext.state === "suspended") {
+                    await audioContext.resume();
+                }
+                return;
+            }
+
+            const AudioContextClass =
+                window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContextClass) {
+                statusText.textContent =
+                    "Trình duyệt của bạn chưa hỗ trợ hiệu ứng âm thanh.";
+                return;
+            }
+
+            audioContext = new AudioContextClass();
+
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.smoothingTimeConstant = 0.82;
+
+            source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+            if (!animationStarted) {
+                animationStarted = true;
+                drawVisualizer();
+            }
+        }
+
+        // =========================================
+        // NÚT PHÁT NHẠC
+        // =========================================
+
+        playBtn.addEventListener("click", async () => {
+            if (!audio.src) {
+                statusText.textContent =
+                    "Bạn hãy nhấn CHỌN FILE NHẠC trước nhé!";
+                return;
+            }
+
+            const images = [
+                document.getElementById("leftPhoto"),
+                document.getElementById("centerPhoto"),
+                document.getElementById("rightPhoto")
+            ];
+
+            const missingImage = images.find(img =>
+                !img.getAttribute("src")
+            );
+
+            if (missingImage) {
+                statusText.textContent =
+                    "Hãy thêm đủ 3 đường dẫn ảnh trong code.";
+                return;
+            }
+
+            const brokenImage = images.find(img =>
+                img.complete && img.naturalWidth === 0
+            );
+
+            if (brokenImage) {
+                statusText.textContent =
+                    "Không tìm thấy file ảnh: " +
+                    brokenImage.getAttribute("src");
+                return;
+            }
+
+            try {
+                await setupVisualizer();
+
+                if (audioContext &&
+                    audioContext.state === "suspended") {
+                    await audioContext.resume();
+                }
+
+                await audio.play();
+
+                gallery.classList.add("show-images");
+                statusText.textContent = "♫ ĐANG PHÁT NHẠC ♫";
+            } catch (error) {
+                statusText.textContent =
+                    "Không phát được nhạc. Hãy thử chọn file khác.";
+            }
+        });
+
+        // =========================================
+        // NÚT TẠM DỪNG
+        // =========================================
+
+        pauseBtn.addEventListener("click", () => {
+            if (!audio.src) {
+                statusText.textContent = "Bạn chưa chọn nhạc.";
+                return;
+            }
+
+            if (!audio.paused) {
+                audio.pause();
+                statusText.textContent = "Đã tạm dừng nhạc.";
+            } else {
+                statusText.textContent = "Nhạc đang tạm dừng.";
+            }
+        });
+
+        // =========================================
+        // NÚT DỪNG
+        // Dừng nhạc và ẩn ảnh, KHÔNG xóa ảnh khỏi code.
+        // =========================================
+
+        stopBtn.addEventListener("click", () => {
+            audio.pause();
+            audio.currentTime = 0;
+
+            gallery.classList.remove("show-images");
+
+            statusText.textContent =
+                "Đã dừng nhạc. Ba ảnh vẫn được giữ nguyên.";
+        });
+
+        // =========================================
+        // KHI NHẠC KẾT THÚC
+        // =========================================
+
+        audio.addEventListener("ended", () => {
+            gallery.classList.remove("show-images");
+            statusText.textContent = "Bài hát đã kết thúc.";
+        });
+
+        audio.addEventListener("error", () => {
+            if (audio.src) {
+                statusText.textContent =
+                    "Không đọc được file nhạc. Hãy chọn file khác.";
+            }
+        });
+
+        // =========================================
+        // VẼ THANH NHẠC
+        // =========================================
+
+        function resizeCanvas() {
+            const ratio = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+
+            canvas.width = Math.max(1, rect.width * ratio);
+            canvas.height = Math.max(1, rect.height * ratio);
+
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            if (!width || !height) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Nền tối
+            const gradient = ctx.createLinearGradient(
+                0, 0, width, height
+            );
+
+            gradient.addColorStop(0, "#090b25");
+            gradient.addColorStop(0.5, "#11102e");
+            gradient.addColorStop(1, "#071a2a");
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Đường sáng giữa
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.strokeStyle = "#00eaff33";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            const playing = !audio.paused && !audio.ended;
+
+            if (analyser && frequencyData && playing) {
+                analyser.getByteFrequencyData(frequencyData);
+            }
+
+            const bars = 56;
+            const gap = 3;
+            const barWidth = Math.max(
+                2,
+                (width - gap * (bars - 1)) / bars
+            );
+
+            for (let i = 0; i < bars; i++) {
+                let value;
+
+                if (analyser && frequencyData && playing) {
+                    const index = Math.floor(
+                        i * frequencyData.length / bars
+                    );
+
+                    value = frequencyData[index] / 255;
+                } else {
+                    // Sóng chuyển động nhẹ khi chưa phát nhạc
+                    value =
+                        0.08 +
+                        Math.abs(Math.sin(Date.now() / 500 + i * 0.35)) *
+                        0.12;
+                }
+
+                const barHeight = Math.max(
+                    4,
+                    value * height * 0.88
+                );
+
+                const x = i * (barWidth + gap);
+                const y = (height - barHeight) / 2;
+
+                const barGradient = ctx.createLinearGradient(
+                    0, y, 0, y + barHeight
+                );
+
+                barGradient.addColorStop(0, "#ff42d0");
+                barGradient.addColorStop(0.5, "#8b5cff");
+                barGradient.addColorStop(1, "#00eaff");
+
+                ctx.fillStyle = barGradient;
+                ctx.shadowBlur = playing ? 12 : 4;
+                ctx.shadowColor = "#00eaff";
+
+                const radius = Math.min(4, barWidth / 2);
+
+                ctx.beginPath();
+                ctx.roundRect(
+                    x, y, barWidth, barHeight, radius
+                );
+                ctx.fill();
+            }
+
+            ctx.shadowBlur = 0;
+        }
+    </script>
+</body>
+</html>
